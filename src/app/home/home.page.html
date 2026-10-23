@@ -1,20 +1,78 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>DAM CRM - Clientes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/gallery"><ion-icon slot="icon-only" name="images-outline"></ion-icon></ion-button>
+      @if (sb.currentUser()) {
+        <ion-button (click)="logout()"><ion-icon slot="icon-only" name="log-out-outline"></ion-icon></ion-button>
+      } @else {
+        <ion-button (click)="goLogin()"><ion-icon slot="icon-only" name="log-in-outline"></ion-icon></ion-button>
+      }
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  @if (!sb.currentUser()) {
+    <ion-card color="light">
+      <ion-card-content>
+        Para insertar, editar o borrar clientes tienes que iniciar sesión.
+        <ion-button fill="outline" size="small" (click)="goLogin()">Iniciar sesión</ion-button>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    <ion-chip>{{ sb.currentUser()?.email }} · {{ sb.userRole() }}</ion-chip>
+  }
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  @if (sb.isAdmin()) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ editingClientId ? 'Editar cliente' : 'Nuevo cliente' }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="clientForm" (ngSubmit)="saveClient()">
+          <ion-input label="Nombre" labelPlacement="stacked" type="text" formControlName="nombre"></ion-input>
+          <ion-input label="Empresa" labelPlacement="stacked" type="text" formControlName="empresa" class="ion-margin-top"></ion-input>
+          <ion-input label="Email" labelPlacement="stacked" type="email" formControlName="email" class="ion-margin-top"></ion-input>
+
+          <div class="ion-margin-top">
+            <ion-button type="submit" expand="block" [disabled]="clientForm.invalid">
+              {{ editingClientId ? 'Actualizar' : 'Guardar' }}
+            </ion-button>
+            @if (editingClientId) {
+              <ion-button type="button" fill="clear" expand="block" color="medium" (click)="resetForm()">Cancelar</ion-button>
+            }
+          </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  }
+
+  <h3>Listado de clientes</h3>
+  <ion-list>
+    @for (client of clients; track client.id) {
+      <ion-item-sliding>
+        <ion-item>
+          <ion-label>
+            <h2>{{ client.nombre }}</h2>
+            <p>{{ client.empresa }} | {{ client.email }}</p>
+          </ion-label>
+        </ion-item>
+        @if (sb.isAdmin()) {
+          <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="editClient(client)">
+              <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="deleteClient(client.id!)">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        }
+      </ion-item-sliding>
+    } @empty {
+      <ion-item><ion-label color="medium">No hay clientes registrados.</ion-label></ion-item>
+    }
+  </ion-list>
+
+  <ion-toast [isOpen]="isToastOpen" [message]="toastMessage" [duration]="2500" (didDismiss)="setToastOpen(false)"></ion-toast>
 </ion-content>

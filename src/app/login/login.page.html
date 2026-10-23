@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-back-button defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-title>Iniciar sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="6" size-lg="4">
+        <ion-card>
+          <ion-card-header><ion-card-title>Acceso</ion-card-title></ion-card-header>
+          <ion-card-content>
+            <form [formGroup]="form" (ngSubmit)="submit()">
+              <ion-input label="Email" labelPlacement="floating" type="email" formControlName="email"></ion-input>
+              <ion-input label="Contraseña" labelPlacement="floating" type="password" formControlName="password" class="ion-margin-top"></ion-input>
+
+              @if (error) { <ion-text color="danger"><p>{{ error }}</p></ion-text> }
+
+              <ion-button type="submit" expand="block" class="ion-margin-top" [disabled]="form.invalid || loading">
+                {{ loading ? 'Entrando...' : 'Entrar' }}
+              </ion-button>
+            </form>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

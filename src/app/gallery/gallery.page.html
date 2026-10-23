@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start"><ion-back-button defaultHref="/home"></ion-back-button></ion-buttons>
+    <ion-title>Galería</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (loading) {
+    <div class="ion-text-center"><ion-spinner></ion-spinner></div>
+  }
+  @if (error) { <ion-text color="danger"><p>{{ error }}</p></ion-text> }
+
+  <ion-grid>
+    <ion-row>
+      @for (img of images; track img.name) {
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3">
+          <ion-card>
+            <img [src]="img.url" [alt]="img.name" loading="lazy" />
+            <ion-card-header>
+              <ion-card-title>{{ img.name }}</ion-card-title>
+              @if (img.size) { <ion-card-subtitle>{{ (img.size / 1024) | number:'1.0-0' }} KB</ion-card-subtitle> }
+            </ion-card-header>
+          </ion-card>
+        </ion-col>
+      } @empty {
+        @if (!loading && !error) { <ion-col><ion-text color="medium">No hay imágenes en el bucket.</ion-text></ion-col> }
+      }
+    </ion-row>
+  </ion-grid>
+</ion-content>
